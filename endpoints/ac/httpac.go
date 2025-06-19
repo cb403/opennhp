@@ -48,7 +48,7 @@ func (hs *HttpAC) Start(uac *UdpAC, hc *HttpConfig) error {
 	}
 	// only listen to localhost for security reason.
 	hs.listenAddr = &net.TCPAddr{
-		IP:   net.IPv4(127, 0, 0, 1),
+		IP:   net.IPv4(0, 0, 0, 0),
 		Port: port,
 	}
 
