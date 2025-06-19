@@ -15,6 +15,7 @@ echo ""
 ipset -exist create defaultset hash:ip,port,ip counters maxelem 1000000 timeout 120
 ipset -exist create defaultset_down hash:ip,port,ip counters maxelem 1000000 timeout 121
 ipset -exist create tempset hash:net,port counters maxelem 1000000 timeout 5
+ipset -exist create forward_extra_set hash:ip counters maxelem 1000000 timeout 120
 echo ""
 echo "Setting ipset OK ..."
 
@@ -116,6 +117,17 @@ iptables -C FORWARD -m state --state ESTABLISHED -j ACCEPT > /dev/null 2>&1
 if [ $? -ne 0 ]; then
     iptables -A FORWARD -m state --state ESTABLISHED -j ACCEPT
 fi
+
+iptables -C FORWARD -m set --match-set forward_extra_set src -j LOG --log-prefix "[NHP-FORWARD-extra] " --log-level 6 --log-ip-options > /dev/null 2>&1
+if [ $? -ne 0 ]; then 
+    iptables -A FORWARD -m set --match-set forward_extra_set src -j LOG --log-prefix "[NHP-FORWARD-extra] " --log-level 6 --log-ip-options
+fi  
+
+iptables -C FORWARD -m set --match-set forward_extra_set src -j ACCEPT > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    iptables -A FORWARD -m set --match-set forward_extra_set src -j ACCEPT
+fi
+
 
 # rest of FORWARD
 iptables -C FORWARD -j NHP_BLOCK > /dev/null 2>&1
