@@ -178,6 +178,7 @@ func (a *UdpAC) HandleAccessControl(au *common.AgentUser, srcAddrs []*common.Net
 								return
 							}
 						}
+					//for ebpf knock
 					case FilterMode_EBPFXDP:
 						if len(dstAddr.Protocol) == 0 || dstAddr.Protocol == "any" {
 							ebpfHashStr := ebpf.EbpfRuleParams{
