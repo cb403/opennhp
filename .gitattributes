@@ -5,6 +5,3 @@
 *.c linguist-language=C
 *.h linguist-language=C
 
-
-Makefile linguist-vendored
-*.md linguist-documentation=true
