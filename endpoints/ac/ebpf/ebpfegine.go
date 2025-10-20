@@ -156,7 +156,7 @@ func EbpfEngineLoad(dirPath string, logLevel int, acId string) error {
 		log.Error("failed to attach XDP program to interface: %s", ifaceName)
 		return err
 	}
-	//load tc eBPF tc_egress.o to net interface which default route exit
+	//load tc eBPF tc_egress.o to net interface which default route exit for egress
 	tcLink, err = link.AttachTCX(link.TCXOptions{
 		Program:   tcObjs.TcEgressProg,
 		Interface: iface.Index,

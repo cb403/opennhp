@@ -11,6 +11,9 @@
 #define ICMP_ECHOREPLY 0
 #define ETH_P_IPV6   0x86DD
 #define IPPROTO_UDP 17
+#define MAX_WHITELIST_ENTRIES   1000000
+#define MAX_PORT 65535
+#define MIN_PORT 0
 
 enum {
     CT_NEW,
@@ -97,7 +100,7 @@ struct {
     __uint(type, BPF_MAP_TYPE_LRU_HASH);
     __type(key, struct whitelist_key);
     __type(value, struct whitelist_value);
-    __uint(max_entries, 1000000);
+    __uint(max_entries, MAX_WHITELIST_ENTRIES);
     __uint(pinning, LIBBPF_PIN_BY_NAME);
 } spp SEC(".maps");
 
@@ -105,7 +108,7 @@ struct {
     __uint(type, BPF_MAP_TYPE_LRU_HASH);
     __type(key, struct src_port_list_key);
     __type(value, struct src_port_list_value);
-    __uint(max_entries, 1000000);
+    __uint(max_entries, MAX_WHITELIST_ENTRIES);
     __uint(pinning, LIBBPF_PIN_BY_NAME);
 } src_port SEC(".maps");
 
@@ -113,7 +116,7 @@ struct {
     __uint(type, BPF_MAP_TYPE_HASH);
     __type(key, struct icmpwhitelist_key);
     __type(value,  struct icmpwhitelist_value);
-    __uint(max_entries, 1000000);
+    __uint(max_entries, MAX_WHITELIST_ENTRIES);
     __uint(pinning, LIBBPF_PIN_BY_NAME);
 } icmpwhitelist SEC(".maps");
 
@@ -121,7 +124,7 @@ struct {
     __uint(type, BPF_MAP_TYPE_LRU_HASH);
     __type(key, struct sdwhitelist_key);
     __type(value, struct sdwhitelist_value);
-    __uint(max_entries, 1000000);
+    __uint(max_entries, MAX_WHITELIST_ENTRIES);
     __uint(pinning, LIBBPF_PIN_BY_NAME);
 } sdwhitelist SEC(".maps");
 
@@ -129,7 +132,7 @@ struct {
     __uint(type, BPF_MAP_TYPE_LRU_HASH);
     __type(key, struct port_list_key);
     __type(value,struct port_list_value);
-    __uint(max_entries, 10000);
+    __uint(max_entries, MAX_WHITELIST_ENTRIES);
     __uint(pinning, LIBBPF_PIN_BY_NAME);
 } port_list SEC(".maps");
 
@@ -137,7 +140,7 @@ struct {
     __uint(type, BPF_MAP_TYPE_LRU_HASH);
     __type(key, struct protocol_port_key);
     __type(value,struct protocol_port_value);
-    __uint(max_entries, 10000);
+    __uint(max_entries, MAX_WHITELIST_ENTRIES);
     __uint(pinning, LIBBPF_PIN_BY_NAME);
 } protocol_port SEC(".maps");
 
@@ -162,7 +165,7 @@ struct conn_value {
 
 struct {
     __uint(type, BPF_MAP_TYPE_LRU_HASH);
-    __uint(max_entries, 1000000);
+    __uint(max_entries, MAX_WHITELIST_ENTRIES);
     __type(key, struct ipv4_ct_tuple);
     __type(value, struct conn_value);
     __uint(pinning, LIBBPF_PIN_BY_NAME);
@@ -382,8 +385,8 @@ static __always_inline int xdp_white_prog(struct xdp_md *ctx) {
 
     struct port_list_key pl_key = {
         .src_ip = iph->saddr,
-        .min_port = 0,
-        .max_port = 65535
+        .min_port = MIN_PORT,
+        .max_port = MAX_PORT
     };
     __u16 dst_port = bpf_ntohs(ct_key.dport);
 
